@@ -14,6 +14,9 @@ public class Player : MonoBehaviour
     [SerializeField] private float increseGravityIn = 3f;
     [SerializeField] private float decreseGravityIn = 1.5f;
 
+    [Header("Events")]
+    [SerializeField] private UnityEvent restartEvents = new UnityEvent();
+
     private Vector2 movement = Vector2.zero;
     private Rigidbody2D rigidbody;
     private bool canStopImpulse = false;
@@ -24,6 +27,7 @@ public class Player : MonoBehaviour
     {
         initialMoveSpeed = moveSpeed;
         rigidbody = GetComponent<Rigidbody2D>();
+        restartEvents.AddListener(RestartPlayer);
     }
 
     // Update is called once per frame
@@ -43,19 +47,15 @@ public class Player : MonoBehaviour
             movement.y = -1;
 
             if (!canStopImpulse)
-            {
-                Debug.Log("increase gravity " + rigidbody.gravityScale);
+            {                
                 moveSpeed += increseGravityIn;
             }
 
-
             canStopImpulse = true;
-
         }
 
         if (canStopImpulse && verticalAxis == 0)
-        {
-            Debug.Log("decrease gravity " + rigidbody.gravityScale);
+        {            
             moveSpeed -= decreseGravityIn;
             canStopImpulse = false;
         }
@@ -70,7 +70,7 @@ public class Player : MonoBehaviour
     {
         if (other.gameObject.tag == "Wall")
         {
-            RestartPlayer();
+            restartEvents?.Invoke();            
         }
 
     }
