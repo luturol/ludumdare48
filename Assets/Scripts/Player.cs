@@ -21,6 +21,7 @@ public class Player : MonoBehaviour
     private Rigidbody2D rigidbody;
     private bool canStopImpulse = false;
     private float initialMoveSpeed;
+    private bool isRestarting = false;
 
     // Start is called before the first frame update
     void Start()
@@ -36,49 +37,57 @@ public class Player : MonoBehaviour
         Movement();
     }
 
-    private void Movement()
-    {
-        movement.x = Input.GetAxis("Horizontal");
-
-        var verticalAxis = Input.GetAxis("Vertical");
-
-        if (verticalAxis < 0)
-        {
-            movement.y = -1;
-
-            if (!canStopImpulse)
-            {                
-                moveSpeed += increseGravityIn;
-            }
-
-            canStopImpulse = true;
-        }
-
-        if (canStopImpulse && verticalAxis == 0)
-        {            
-            moveSpeed -= decreseGravityIn;
-            canStopImpulse = false;
-        }
-    }
-
     private void FixedUpdate()
     {
-        rigidbody.MovePosition(rigidbody.position + movement * moveSpeed * Time.fixedDeltaTime);
+        if (isRestarting && transform.position.x == restartPosition.position.x && transform.position.y == restartPosition.position.y)
+        {
+            moveSpeed = initialMoveSpeed;    
+            isRestarting = false;        
+        }
+        else
+        {            
+            rigidbody.MovePosition(rigidbody.position + movement * moveSpeed * Time.fixedDeltaTime);
+        }
     }
 
     private void OnCollisionEnter2D(Collision2D other)
     {
         if (other.gameObject.tag == "Wall")
         {
-            restartEvents?.Invoke();            
+            restartEvents?.Invoke();
+        }
+    }
+
+    private void Movement()
+    {
+        movement.x = Input.GetAxis("Horizontal");
+
+        float verticalAxis = Input.GetAxis("Vertical");
+
+        if (verticalAxis < 0)
+        {
+            movement.y = -1;
+
+            if (!canStopImpulse && !isRestarting)
+            {
+                moveSpeed += increseGravityIn;
+                canStopImpulse = true;
+            }
         }
 
+        if (canStopImpulse && verticalAxis == 0)
+        {
+            if(moveSpeed > initialMoveSpeed)
+                moveSpeed -= decreseGravityIn;
+            canStopImpulse = false;
+        }
     }
 
     private void RestartPlayer()
     {
         moveSpeed = initialMoveSpeed;
         transform.position = restartPosition.position;
+        isRestarting = true;
     }
 
 }
