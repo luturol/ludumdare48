@@ -12,7 +12,15 @@ public class CameraFollow : MonoBehaviour
     public UnityEvent events = new UnityEvent();
     public bool FreezeY { get; set; }
 
+    private Camera camera;
     private float initialOffset;
+
+
+    private void Awake()
+    {
+        camera = Camera.main;
+    }
+
     // Start is called before the first frame update
     void Start()
     {
@@ -25,9 +33,15 @@ public class CameraFollow : MonoBehaviour
         Vector3 position = transform.position;
         position.x = player.transform.position.x;
 
-        if(!FreezeY)
+        if (!FreezeY)
             position.y = player.transform.position.y - offset;
-        
+
         transform.position = position;
-    }        
+    }
+
+    public bool ObjectIsVisible(Transform objectTransform)
+    {
+        Vector3 screenPoint = camera.WorldToViewportPoint(objectTransform.position);
+        return screenPoint.z > 0 && screenPoint.x > 0 && screenPoint.x < 1 && screenPoint.y > 0 && screenPoint.y < 1;
+    }
 }
