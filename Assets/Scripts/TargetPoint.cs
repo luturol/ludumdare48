@@ -7,34 +7,16 @@ public class TargetPoint : MonoBehaviour
 {
     [Header("Events")]
     [SerializeField] private UnityEvent collisionEvents;
-    [SerializeField] private UnityEvent renderEvents;
-
-    private CameraFollow cameraFollow;
-
-    private void Awake()
-    {
-        cameraFollow = FindObjectOfType<CameraFollow>();
-    }
-
+    [SerializeField] private UnityEvent<Transform> renderEvents;
+    
     private void Update()
     {
-        if (cameraFollow != null && cameraFollow.ObjectIsVisible(transform))
-        {
-            renderEvents?.Invoke();
-        }
-
+        renderEvents?.Invoke(transform);
     }
-
-    private void OnWillRenderObject()
-    {
-        //renderEvents?.Invoke();
-    }
-
     private void OnCollisionEnter2D(Collision2D other)
     {
         if (other.gameObject.tag == "Player")
         {
-            //Finish game logic
             collisionEvents?.Invoke();
         }
     }

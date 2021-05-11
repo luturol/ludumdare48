@@ -10,7 +10,8 @@ public class CameraFollow : MonoBehaviour
     [SerializeField] private float offset;
 
     public UnityEvent events = new UnityEvent();
-    public bool FreezeY { get; set; }
+
+    private bool FreezeY = false;
 
     private Camera camera;
     private float initialOffset;
@@ -39,7 +40,13 @@ public class CameraFollow : MonoBehaviour
         transform.position = position;
     }
 
-    public bool ObjectIsVisible(Transform objectTransform)
+
+    public void MustFreezeYAxis(Transform objectTransform)
+    {
+        FreezeY = ObjectIsVisible(objectTransform);
+    }
+    
+    private bool ObjectIsVisible(Transform objectTransform)
     {
         Vector3 screenPoint = camera.WorldToViewportPoint(objectTransform.position);
         return screenPoint.z > 0 && screenPoint.x > 0 && screenPoint.x < 1 && screenPoint.y > 0 && screenPoint.y < 1;
